@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Environment variables — never commit API keys
+.env
+.env.*
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Outputs — generated reports and attack artifacts
+outputs/
+*.pdf
+*.png
+*.jpg
+*.jpeg
+
+# Model weights and checkpoints — too large for git
+*.pt
+*.pth
+*.bin
+*.safetensors
+checkpoints/
+
+# HuggingFace local cache (if ever downloaded locally)
+models_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# macOS
+.DS_Store
+.AppleDouble
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
