@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  redqueen:
+    build: .
+    container_name: redqueen_api
+    ports:
+      - "8000:8000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+    volumes:
+      - ./outputs:/app/outputs
+    restart: unless-stopped
+    # Phase 8: Dockerfile + full API service wired in here
