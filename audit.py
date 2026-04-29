@@ -1,5 +1,5 @@
 """
-Red Queen — Autonomous ML Red-Teaming Agent
+ANVIL — Adversarial Neural Vulnerability Inspection and Learning
 CLI entry point. Phases 2-7 will fill in the pipeline steps.
 """
 import argparse
@@ -9,7 +9,7 @@ import sys
 def parse_args():
     parser = argparse.ArgumentParser(
         prog="audit",
-        description="Red Queen: autonomous ML red-teaming agent",
+        description="ANVIL: adversarial neural vulnerability inspection and learning",
     )
     parser.add_argument(
         "--model",
@@ -42,7 +42,7 @@ def parse_args():
 def main():
     args = parse_args()
 
-    print(f"[Red Queen] Starting audit")
+    print(f"[ANVIL] Starting audit")
     print(f"  Model  : {args.model}")
     print(f"  Input  : {args.input}")
     print(f"  Output : {args.output}")
@@ -56,7 +56,7 @@ def main():
     # Phase 6: Autonomous patching             (coming in Phase 6)
     # Phase 7: PDF report generation           (coming in Phase 7)
 
-    print("[Red Queen] Pipeline not yet implemented — scaffold only.")
+    print("[ANVIL] Pipeline not yet implemented — scaffold only.")
     return 0
 
 

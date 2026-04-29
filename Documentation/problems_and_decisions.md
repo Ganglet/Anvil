@@ -1,4 +1,4 @@
-# Problems Faced & Key Decisions — Red Queen
+# Problems Faced & Key Decisions — ANVIL
 
 This document is a running log of every non-trivial problem encountered and every design decision made during the project. Updated after each implementation step. Serves as source material for the README's limitations section and interview answers.
 

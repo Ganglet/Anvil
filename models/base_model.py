@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional
+from typing import List
 import torch
 
 
 class BaseModel(ABC):
     """
-    Model-agnostic interface. Every model Red Queen attacks must implement these
+    Model-agnostic interface. Every model ANVIL attacks must implement these
     three methods — predict, get_gradients, get_activations. Phases 3-6 depend on them.
     """
 

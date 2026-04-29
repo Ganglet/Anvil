@@ -15,7 +15,7 @@ Establish the full repository skeleton and implement the model-agnostic interfac
 ## 1. Repository Structure
 
 ```
-RedQueen_Project/
+Anvil_Project/
 ├── models/
 │   ├── __init__.py
 │   ├── base_model.py        ← abstract interface
@@ -38,7 +38,7 @@ RedQueen_Project/
 
 ## 2. Model-Agnostic Interface — `models/base_model.py`
 
-Abstract base class. Any model passed to Red Queen must subclass this and implement all three abstract methods. The ABC enforces this at instantiation — a subclass that skips any method cannot be constructed.
+Abstract base class. Any model passed to ANVIL must subclass this and implement all three abstract methods. The ABC enforces this at instantiation — a subclass that skips any method cannot be constructed.
 
 **Three abstract methods:**
 
