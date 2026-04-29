@@ -97,3 +97,12 @@ This document is a running log of every non-trivial problem encountered and ever
 **Why sufficient:** The 10 papers chosen (Goodfellow 2014, Szegedy 2013, Madry 2018, Geirhos 2019/2020, Ilyas 2019, Zech 2018, Carlini & Wagner 2017, Brown 2017, Papernot 2016) collectively cover every major vulnerability class (texture bias, shortcut learning, gradient sensitivity, spurious correlations, patch robustness) and every principal remediation approach. There is no major conceptual gap left uncovered.
 **Why not more:** RAG retrieves the top-k most similar chunks and sends them to the LLM as context. A larger corpus with loosely related papers increases the chance that top-k slots are occupied by tangentially relevant chunks, diluting the context quality. More papers also means more curation effort — we use structured summaries optimised for retrieval, not raw PDFs. Adding papers that don't introduce new concepts wastes curation time without improving retrieval quality.
 **Not a hard limit:** The FAISS index handles hundreds of papers at the same millisecond-level search speed. If a new vulnerability class emerges that isn't covered, adding a paper is trivial.
+
+---
+
+## D10 — Small hardcoded synonym map for TextAttack, not WordNet
+
+**Phase:** 3 — Attack Engine
+**Decision:** `text_attack.py` uses a hardcoded dict of ~8 word→synonyms rather than NLTK WordNet or a masked-LM for synonym generation.
+**Why:** WordNet adds a dependency and startup cost for a feature that is not the core contribution of ANVIL. The synonym map covers enough vocabulary to demonstrate the perturbation logic and pass tests. In a production version targeting real NLP classifiers, WordNet or a context-aware masked-LM swap would be appropriate.
+**Tradeoff accepted:** The current map will fail to perturb inputs that contain none of its 8 keywords. The `_char_flip` and `_word_insert` fallbacks ensure the attack still runs — they just produce weaker perturbations.
