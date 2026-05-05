@@ -1,9 +1,17 @@
 """
 ANVIL — Adversarial Neural Vulnerability Inspection and Learning
-CLI entry point. Phases 2-7 will fill in the pipeline steps.
+CLI entry point. Phases 1-4 wired; 5-7 stubs pending implementation.
 """
 import argparse
 import sys
+import torch
+
+from models.image_model import ImageModel
+from models.text_model import TextModel
+from profiler.attack_surface import AttackSurfaceProfiler
+from attacks.engine import AttackEngine
+from clustering.feature_extractor import FeatureExtractor
+from clustering.clusterer import FailureModeClusterer
 
 
 def parse_args():
@@ -33,30 +41,96 @@ def parse_args():
     parser.add_argument(
         "--budget",
         type=int,
-        default=100,
-        help="Number of attack samples to generate (default: 100)",
+        default=20,
+        help="Number of attack samples to generate (default: 20)",
     )
     return parser.parse_args()
+
+
+def _load_model(model_arg: str):
+    if model_arg == "resnet18":
+        return ImageModel(pretrained=True)
+    return TextModel()
+
+
+def _make_inputs(model, n: int):
+    """
+    Synthetic inputs for the pipeline until Phase 8 adds a real input loader.
+    Labels are the model's own predictions on the synthetic inputs — consistent
+    ground truth for a model we're probing, not training.
+    """
+    if "distilbert" in model.model_name:
+        inputs = torch.randint(100, 30000, (n, 64))
+    else:
+        inputs = torch.rand(n, 3, 224, 224)
+
+    with torch.no_grad():
+        logits = model.predict(inputs)
+    labels = logits.argmax(dim=1).tolist()
+    return inputs, labels
 
 
 def main():
     args = parse_args()
 
-    print(f"[ANVIL] Starting audit")
+    print("[ANVIL] Starting audit")
     print(f"  Model  : {args.model}")
     print(f"  Input  : {args.input}")
     print(f"  Output : {args.output}")
     print(f"  Budget : {args.budget} samples")
     print()
 
-    # Phase 2: Attack surface profiler         (coming in Phase 2)
-    # Phase 3: Multi-strategy attack engine    (coming in Phase 3)
-    # Phase 4: Failure mode clustering         (coming in Phase 4)
-    # Phase 5: LLM explanation agent           (coming in Phase 5)
-    # Phase 6: Autonomous patching             (coming in Phase 6)
-    # Phase 7: PDF report generation           (coming in Phase 7)
+    # ── Phase 1: Load model ───────────────────────────────────────────────────
+    model = _load_model(args.model)
+    print(f"[1/7] Model loaded: {model.model_name}")
 
-    print("[ANVIL] Pipeline not yet implemented — scaffold only.")
+    inputs, labels = _make_inputs(model, args.budget)
+    print(f"      {len(inputs)} synthetic inputs  (real loader: Phase 8)")
+
+    # ── Phase 2: Attack surface profiler ──────────────────────────────────────
+    profile_n = min(10, args.budget)
+    profiler = AttackSurfaceProfiler(model)
+    profile = profiler.profile(inputs[:profile_n], labels[:profile_n])
+
+    print(f"[2/7] Profile complete")
+    print(f"      Vulnerability score : {profile['vulnerability_score']:.3f}")
+    print(f"      Attack priority     : {profile['attack_priority'][:3]}")
+
+    # ── Phase 3: Multi-strategy attack engine ─────────────────────────────────
+    engine = AttackEngine(model)
+    attack_results = engine.run(inputs, labels, profile)
+    rates = engine.success_rate(attack_results)
+
+    print(f"[3/7] Attacks complete")
+    for name, rate in rates.items():
+        print(f"      {name:<10} {rate:.1%} success rate")
+
+    all_examples = [ex for exs in attack_results.values() for ex in exs]
+    total_success = sum(1 for ex in all_examples if ex.success)
+    print(f"      {total_success}/{len(all_examples)} examples fooled the model")
+
+    # ── Phase 4: Failure mode clustering ──────────────────────────────────────
+    extractor = FeatureExtractor(model, profile)
+    vectors, successful = extractor.extract(all_examples)
+
+    if len(vectors) < 2:
+        print(f"[4/7] Clustering skipped — fewer than 2 successful attacks")
+    else:
+        taxonomy = FailureModeClusterer().cluster(
+            vectors, successful, model_name=model.model_name
+        )
+        s = taxonomy.summary()
+        print(f"[4/7] Clustering complete")
+        print(f"      {s['num_clusters']} vulnerability clusters, {s['noise_count']} noise points")
+        for c in s["clusters"]:
+            dist = ", ".join(f"{k}:{v}" for k, v in c["attack_distribution"].items())
+            print(f"      [{c['id']}] {c['name']}  size={c['size']}  ({dist})")
+
+    # ── Phase 5–7 stubs ───────────────────────────────────────────────────────
+    print(f"[5/7] LLM explanation agent   — Phase 5 (pending)")
+    print(f"[6/7] Autonomous patching     — Phase 6 (pending)")
+    print(f"[7/7] PDF report generation   — Phase 7 (pending)")
+
     return 0
 
 
