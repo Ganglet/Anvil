@@ -100,6 +100,23 @@ This document is a running log of every non-trivial problem encountered and ever
 
 ---
 
+## D11 — Activation pooling collapses spatial/sequence dims before UMAP
+
+**Phase:** 4 — Failure Mode Clustering
+**Decision:** Before feeding activations to UMAP, pool spatial dimensions (ResNet) or sequence dimensions (DistilBERT) to a single 1D vector via global average pooling.
+**Why:** Raw ResNet layer4 output is `(1, 512, 7, 7)` — a 25,088-dimensional vector. DistilBERT transformer layer output is `(1, seq_len, 768)`. UMAP can handle high dimensions but performance and embedding quality degrade significantly above ~1,000 dimensions. Global average pooling collapses these to 512D and 768D respectively while retaining the mean activation pattern across spatial positions/tokens. This is the same pooling ResNet itself uses before its final classifier, so it is a meaningful representation of "what the model attended to" rather than spatial noise.
+**Alternative considered:** Flatten and PCA-reduce before UMAP. Rejected — this adds a linear reduction step before a non-linear one. Global average pooling is semantically grounded (the model's own summary of the layer), not an arbitrary linear projection.
+
+---
+
+## D12 — Profile subset (10 samples) for Phase 2, full budget for Phase 3
+
+**Phase:** 4 — audit.py wiring
+**Decision:** Phase 2 profiling runs on `min(10, budget)` samples; Phase 3 attacks run on all `budget` samples.
+**Why:** Profiling measures layer sensitivity properties of the model itself — these are stable across inputs. 10 samples is sufficient to get reliable gradient norm and activation entropy estimates. Running profiling on 100 samples would be 10× slower with negligible accuracy gain. Phase 3 attacks, by contrast, are sample-specific — each adversarial example is a distinct data point for clustering. More samples produce more failures to cluster, improving Phase 4's ability to find distinct groups.
+
+---
+
 ## D10 — Small hardcoded synonym map for TextAttack, not WordNet
 
 **Phase:** 3 — Attack Engine
