@@ -1,6 +1,6 @@
 """
 ANVIL — Adversarial Neural Vulnerability Inspection and Learning
-CLI entry point. Phases 1-4 wired; 5-7 stubs pending implementation.
+CLI entry point. Phases 1-5 wired; 6-7 stubs pending implementation.
 """
 import argparse
 import sys
@@ -12,6 +12,7 @@ from profiler.attack_surface import AttackSurfaceProfiler
 from attacks.engine import AttackEngine
 from clustering.feature_extractor import FeatureExtractor
 from clustering.clusterer import FailureModeClusterer
+from agent.graph import run_agent
 
 
 def parse_args():
@@ -115,19 +116,28 @@ def main():
 
     if len(vectors) < 2:
         print(f"[4/7] Clustering skipped — fewer than 2 successful attacks")
-    else:
-        taxonomy = FailureModeClusterer().cluster(
-            vectors, successful, model_name=model.model_name
-        )
-        s = taxonomy.summary()
-        print(f"[4/7] Clustering complete")
-        print(f"      {s['num_clusters']} vulnerability clusters, {s['noise_count']} noise points")
-        for c in s["clusters"]:
-            dist = ", ".join(f"{k}:{v}" for k, v in c["attack_distribution"].items())
-            print(f"      [{c['id']}] {c['name']}  size={c['size']}  ({dist})")
+        return 0
 
-    # ── Phase 5–7 stubs ───────────────────────────────────────────────────────
-    print(f"[5/7] LLM explanation agent   — Phase 5 (pending)")
+    taxonomy = FailureModeClusterer().cluster(
+        vectors, successful, model_name=model.model_name
+    )
+    s = taxonomy.summary()
+    print(f"[4/7] Clustering complete")
+    print(f"      {s['num_clusters']} vulnerability clusters, {s['noise_count']} noise points")
+    for c in s["clusters"]:
+        dist = ", ".join(f"{k}:{v}" for k, v in c["attack_distribution"].items())
+        print(f"      [{c['id']}] {c['name']}  size={c['size']}  ({dist})")
+
+    # ── Phase 5: LLM explanation agent ───────────────────────────────────────
+    print(f"[5/7] Running LLM explanation agent")
+    report = run_agent(taxonomy)
+    rs = report.summary()
+    print(f"      {rs['num_clusters_explained']} clusters explained")
+    for e in report.explanations:
+        print(f"      [{e.cluster_id}] strategy={e.patch_strategy}  sources={len(e.sources)}")
+        print(f"      {e.explanation[:120]}...")
+
+    # ── Phase 6–7 stubs ───────────────────────────────────────────────────────
     print(f"[6/7] Autonomous patching     — Phase 6 (pending)")
     print(f"[7/7] PDF report generation   — Phase 7 (pending)")
 
