@@ -25,13 +25,15 @@ This document is a running log of every non-trivial problem encountered and ever
 
 ---
 
-## D2 — Groq API over local Ollama + Mistral 7B for LLM inference
+## D2 — Gemini 2.5 Flash over Groq / Ollama for LLM inference
 
 **Phase:** 5 — LLM Explanation Agent
-**Decision:** Use Groq API (Llama 3 70B, free tier) instead of running Ollama + Mistral 7B locally as specified in the original blueprint.
-**Why:** Mistral 7B requires a GPU for reasonable inference speed. Oracle Always Free VM has no GPU — running a 7B model on 4 ARM CPU cores would make each LangGraph node take minutes. Groq's inference hardware runs Llama 3 70B at ~500ms per call, free tier, with no local resource cost. A bigger model (70B vs 7B) also produces better explanations for adversarial ML concepts.
-**Why not alternative:** HuggingFace Inference API is rate-limited and slower. OpenAI costs money. Self-hosted GPU instances cost ~$380/month on AWS.
-**Code impact:** ~10 line change in `agent/nodes/` — swap `OllamaLLM` for `ChatGroq`. Architecture is otherwise identical.
+**Decision:** Use Google Gemini 2.5 Flash (via `langchain-google-genai`) instead of Groq API (Llama 3 70B) as originally planned, which itself replaced the blueprint's Ollama + Mistral 7B.
+**Why Groq was dropped:** Groq account creation failed repeatedly across multiple emails and auth methods — the console.groq.com SSO consistently rejected the account. Not a technical decision, a practical blocker.
+**Why Gemini 2.5 Flash over Gemini 2.0 Flash:** Both are available on the free tier key, but `gemini-2.0-flash` returned `limit: 0` (quota not provisioned for free tier in this region). `gemini-2.5-flash` worked immediately and is a newer, more capable model.
+**Why Gemini over other alternatives:** Free tier with a Google account already in use. `langchain-google-genai` is a drop-in swap — same LangChain interface, 2-line change from the Groq version. No local GPU required. 1M token context window vs 8K on Groq free tier. Better reasoning quality than Llama 3 70B for technical explanation tasks.
+**Why not Ollama/Mistral 7B locally:** Oracle Always Free VM has no GPU. CPU inference on 7B model takes minutes per call — too slow for a 5-10 call audit pipeline.
+**Code impact:** `ChatGoogleGenerativeAI(model="gemini-2.5-flash")` in `agent/graph.py`. Architecture otherwise identical to the Groq design.
 
 ---
 
