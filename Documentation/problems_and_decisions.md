@@ -119,6 +119,15 @@ This document is a running log of every non-trivial problem encountered and ever
 
 ---
 
+## D13 — Fine-tune only the last layer during patching, not the full model
+
+**Phase:** 6 — Autonomous Patching
+**Decision:** All four patching strategies fine-tune only the final linear layer (ResNet's `fc` or DistilBERT's `classifier`), not all parameters.
+**Why:** Fine-tuning all parameters on 3–8 gradient steps with a small augmented batch pushes the model toward that specific batch. Representations in early layers (edges, textures, token embeddings) would overfit to the few training samples, severely degrading clean accuracy. The last layer adapts the decision boundary without disturbing the feature representations learned during original training. This is the same principle as transfer learning — freeze the backbone, adapt the head.
+**Tradeoff accepted:** Patching only the final layer limits how much adversarial robustness can be gained from a few fine-tuning steps. On CPU with 3–8 steps, meaningful resistance gains are unlikely for hard vulnerability classes. The architecture is correct for the approach; the demo is intentionally bounded by compute.
+
+---
+
 ## D10 — Small hardcoded synonym map for TextAttack, not WordNet
 
 **Phase:** 3 — Attack Engine
