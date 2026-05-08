@@ -13,6 +13,7 @@ from attacks.engine import AttackEngine
 from clustering.feature_extractor import FeatureExtractor
 from clustering.clusterer import FailureModeClusterer
 from agent.graph import run_agent
+from patching.patcher import Patcher
 
 
 def parse_args():
@@ -137,8 +138,20 @@ def main():
         print(f"      [{e.cluster_id}] strategy={e.patch_strategy}  sources={len(e.sources)}")
         print(f"      {e.explanation[:120]}...")
 
-    # ── Phase 6–7 stubs ───────────────────────────────────────────────────────
-    print(f"[6/7] Autonomous patching     — Phase 6 (pending)")
+    # ── Phase 6: Autonomous patching ──────────────────────────────────────────
+    print(f"[6/7] Running autonomous patching")
+    patcher = Patcher()
+    patch_report = patcher.patch(model, taxonomy, report, inputs, labels)
+    ps = patch_report.summary()
+    print(f"      {ps['patched']}/{ps['total_clusters']} clusters patched, {ps['unresolved']} unresolved")
+    for r in patch_report.results:
+        status = "pass" if r.passed else "FAIL"
+        print(
+            f"      [{status}] cluster {r.cluster_id}  strategy={r.strategy}"
+            f"  score={r.safety_score:.3f}  retries={r.retries}"
+        )
+
+    # ── Phase 7 stub ──────────────────────────────────────────────────────────
     print(f"[7/7] PDF report generation   — Phase 7 (pending)")
 
     return 0
