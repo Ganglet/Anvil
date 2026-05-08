@@ -1,3 +1,4 @@
+import time
 from typing import Any, Dict
 
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -5,6 +6,25 @@ from langchain_core.messages import HumanMessage
 
 from agent.retriever import PaperRetriever
 from agent.schema import ClusterExplanation
+
+_MAX_RETRIES = 4
+_RETRY_DELAYS = [5, 15, 30, 60]
+
+
+def _invoke_with_retry(llm, messages):
+    """Invoke LLM with exponential backoff on 503/429 errors."""
+    for attempt, delay in enumerate(_RETRY_DELAYS):
+        try:
+            return llm.invoke(messages)
+        except Exception as e:
+            msg = str(e)
+            if attempt == len(_RETRY_DELAYS) - 1:
+                raise
+            if "503" in msg or "429" in msg or "UNAVAILABLE" in msg or "quota" in msg.lower():
+                print(f"      [retry {attempt + 1}/{_MAX_RETRIES}] Gemini unavailable, waiting {delay}s...")
+                time.sleep(delay)
+            else:
+                raise
 
 PATCH_STRATEGIES = [
     "adversarial_training",
@@ -83,7 +103,7 @@ def explain_node(state: Dict[str, Any]) -> Dict[str, Any]:
         context=context,
     )
 
-    response = llm.invoke([HumanMessage(content=prompt)])
+    response = _invoke_with_retry(llm, [HumanMessage(content=prompt)])
     state["explanation"] = response.content.strip()
     return state
 
@@ -99,7 +119,7 @@ def recommend_node(state: Dict[str, Any]) -> Dict[str, Any]:
         explanation=explanation,
     )
 
-    response = llm.invoke([HumanMessage(content=prompt)])
+    response = _invoke_with_retry(llm, [HumanMessage(content=prompt)])
     patch_params = _parse_recommendation(response.content.strip())
 
     sources = list({c["source"] for c in state["chunks"]})
