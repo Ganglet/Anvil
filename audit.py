@@ -14,6 +14,7 @@ from clustering.feature_extractor import FeatureExtractor
 from clustering.clusterer import FailureModeClusterer
 from agent.graph import run_agent
 from patching.patcher import Patcher
+from reporter.report import generate_report
 
 
 def parse_args():
@@ -151,8 +152,20 @@ def main():
             f"  score={r.safety_score:.3f}  retries={r.retries}"
         )
 
-    # ── Phase 7 stub ──────────────────────────────────────────────────────────
-    print(f"[7/7] PDF report generation   — Phase 7 (pending)")
+    # ── Phase 7: PDF report generation ───────────────────────────────────────
+    print(f"[7/7] Generating PDF audit report")
+    generate_report(
+        output_path=args.output,
+        model_name=model.model_name,
+        profile=profile,
+        attack_rates=rates,
+        total_fooled=total_success,
+        total_examples=len(all_examples),
+        taxonomy=taxonomy,
+        explanation_report=report,
+        patch_report=patch_report,
+    )
+    print(f"      Report written to: {args.output}")
 
     return 0
 
