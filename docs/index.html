@@ -156,39 +156,102 @@
     }
 
     /* ── Demo ── */
-    .demo-box {
-      margin-top: 2.5rem;
+    #demo { background: var(--light); }
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      background: var(--white);
+    }
+    .upload-area:hover, .upload-area.drag-over {
+      border-color: var(--accent);
+      background: #eff6ff;
+    }
+    .upload-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .upload-text { font-size: 1rem; font-weight: 600; color: var(--navy); }
+    .upload-link { color: var(--accent); cursor: pointer; text-decoration: underline; }
+    .upload-sub { font-size: 0.8rem; color: var(--slate); margin-top: 0.35rem; }
+    .file-list { margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+    .file-item {
+      background: var(--accent-l); color: var(--accent);
+      font-size: 0.75rem; font-weight: 600;
+      padding: 0.2rem 0.65rem; border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .form-row { margin-top: 1.75rem; }
+    .form-label {
+      display: block; font-size: 0.875rem; font-weight: 600;
+      color: var(--navy); margin-bottom: 0.5rem;
+    }
+    .slider {
+      width: 100%; accent-color: var(--accent);
+      height: 4px; cursor: pointer;
+    }
+    .slider-hint { font-size: 0.75rem; color: var(--slate); margin-top: 0.35rem; }
+    .run-btn {
+      margin-top: 1.75rem; width: 100%;
+      justify-content: center; font-size: 1rem;
+      padding: 0.85rem; cursor: pointer; border: none;
+    }
+    .run-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .demo-note {
+      margin-top: 0.75rem; font-size: 0.8rem;
+      color: var(--slate); text-align: center;
+    }
+    .demo-status {
+      margin-top: 2rem;
       background: var(--navy);
       border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.06);
+      padding: 1.75rem;
     }
-    .demo-bar {
-      background: rgba(255,255,255,0.05);
-      padding: 0.6rem 1rem;
-      display: flex; align-items: center; gap: 0.5rem;
+    .status-bar {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1rem;
     }
-    .demo-dot {
-      width: 12px; height: 12px;
-      border-radius: 50%;
+    .status-indicator {
+      width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
     }
-    .demo-content {
-      padding: 1.5rem;
+    .status-indicator.pending  { background: #fbbf24; }
+    .status-indicator.running  { background: #60a5fa; animation: pulse 1.2s infinite; }
+    .status-indicator.complete { background: #4ade80; }
+    .status-indicator.error    { background: #f87171; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .status-text {
+      font-size: 0.95rem; font-weight: 600; color: var(--white);
+    }
+    .phase-log {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
-      color: #94a3b8;
-      line-height: 1.8;
-      min-height: 220px;
+      font-size: 0.78rem; color: #94a3b8;
+      line-height: 1.9;
+      min-height: 80px;
     }
-    .demo-content .c-green  { color: #4ade80; }
-    .demo-content .c-blue   { color: #60a5fa; }
-    .demo-content .c-white  { color: #f1f5f9; }
-    .demo-content .c-yellow { color: #fbbf24; }
-    .demo-gif-placeholder {
-      display: flex; align-items: center; justify-content: center;
-      height: 220px; color: #475569; font-size: 0.85rem;
-      flex-direction: column; gap: 0.5rem;
+    .log-line { color: #94a3b8; }
+    .log-line.success { color: #4ade80; }
+    .download-area {
+      margin-top: 1.25rem;
+      display: flex; gap: 0.75rem; flex-wrap: wrap;
     }
+    .btn-download {
+      background: #059669; color: var(--white);
+      padding: 0.7rem 1.5rem; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 600;
+      text-decoration: none; display: inline-flex;
+      align-items: center; gap: 0.4rem;
+      transition: background 0.15s;
+    }
+    .btn-download:hover { background: #047857; }
+    .btn-reset {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--white);
+      padding: 0.7rem 1.25rem; border-radius: 8px;
+      font-size: 0.875rem; font-weight: 600;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .btn-reset:hover { background: rgba(255,255,255,0.08); }
 
     /* ── Stack ── */
     #stack { background: var(--white); }
@@ -406,36 +469,42 @@
 <!-- Demo -->
 <section id="demo">
   <div class="container">
-    <div class="section-label">Demo</div>
-    <h2 class="section-title">Full pipeline in one command</h2>
+    <div class="section-label">Live Demo</div>
+    <h2 class="section-title">Run the full pipeline on your images</h2>
     <p class="section-sub">
-      Run the audit, watch each phase complete in the terminal, open the generated PDF.
+      Upload images, hit Run — all 7 phases execute live on the server and you get a real PDF audit report back.
     </p>
     <div class="divider"></div>
-    <div class="demo-box">
-      <div class="demo-bar">
-        <div class="demo-dot" style="background:#ef4444"></div>
-        <div class="demo-dot" style="background:#f59e0b"></div>
-        <div class="demo-dot" style="background:#22c55e"></div>
-        <span style="margin-left:0.5rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#475569">
-          terminal — audit.py
-        </span>
+
+    <div id="demoForm">
+      <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp,.bmp" multiple hidden />
+        <div class="upload-icon">🖼️</div>
+        <div class="upload-text">Drop images here or <span class="upload-link">browse</span></div>
+        <div class="upload-sub">JPG · PNG · WebP · No images? Runs on synthetic inputs as fallback.</div>
+        <div class="file-list" id="fileList"></div>
       </div>
-      <div class="demo-content">
-        <div><span class="c-green">$</span> <span class="c-white">python audit.py --model resnet18 --input ./samples/ --budget 50</span></div>
-        <div>&nbsp;</div>
-        <div><span class="c-blue">[ANVIL]</span> <span class="c-white">Starting audit</span></div>
-        <div>&nbsp;&nbsp;Model  : <span class="c-yellow">resnet18</span> &nbsp;&nbsp; Budget : <span class="c-yellow">50 samples</span></div>
-        <div>&nbsp;</div>
-        <div><span class="c-blue">[1/7]</span> Model loaded: resnet18</div>
-        <div><span class="c-blue">[2/7]</span> Profile complete &nbsp; vulnerability score : <span class="c-yellow">0.421</span></div>
-        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attack priority : [<span class="c-white">layer4</span>, <span class="c-white">layer1</span>, <span class="c-white">avgpool</span>]</div>
-        <div><span class="c-blue">[3/7]</span> Attacks complete</div>
-        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FGSM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-green">100.0%</span> success &nbsp; PGD <span class="c-green">100.0%</span> success</div>
-        <div><span class="c-blue">[4/7]</span> Clustering complete — <span class="c-yellow">2</span> vulnerability clusters</div>
-        <div><span class="c-blue">[5/7]</span> LLM agent — 2 clusters explained</div>
-        <div><span class="c-blue">[6/7]</span> Patching — 1/2 clusters patched</div>
-        <div><span class="c-blue">[7/7]</span> Report written to: <span class="c-green">audit_report.pdf</span></div>
+
+      <div class="form-row">
+        <label class="form-label">Attack budget: <strong id="budgetVal">20</strong> samples</label>
+        <input type="range" id="budgetSlider" min="5" max="30" value="20" class="slider"
+               oninput="document.getElementById('budgetVal').textContent=this.value" />
+        <div class="slider-hint">Fewer samples = faster (≈2 min) · More = thorough (≈5 min)</div>
+      </div>
+
+      <button class="btn btn-primary run-btn" id="runBtn" onclick="runAudit()">Run Audit</button>
+      <p class="demo-note">ResNet-18 on ImageNet · Your images are processed on the HuggingFace server and not stored.</p>
+    </div>
+
+    <div class="demo-status" id="demoStatus" style="display:none">
+      <div class="status-bar">
+        <div class="status-indicator pending" id="statusDot"></div>
+        <div class="status-text" id="statusText">Starting...</div>
+      </div>
+      <div class="phase-log" id="phaseLog"></div>
+      <div class="download-area" id="downloadArea" style="display:none">
+        <a id="downloadLink" class="btn-download" target="_blank">⬇ Download PDF Report</a>
+        <button class="btn-reset" onclick="resetDemo()">Run another</button>
       </div>
     </div>
   </div>
@@ -545,5 +614,119 @@
   </p>
 </footer>
 
+<script>
+  const API = "https://angshuman12-anvil.hf.space";
+  let pollTimer = null;
+
+  const uploadArea = document.getElementById("uploadArea");
+  const fileInput  = document.getElementById("fileInput");
+
+  uploadArea.addEventListener("dragover", e => {
+    e.preventDefault();
+    uploadArea.classList.add("drag-over");
+  });
+  uploadArea.addEventListener("dragleave", () => uploadArea.classList.remove("drag-over"));
+  uploadArea.addEventListener("drop", e => {
+    e.preventDefault();
+    uploadArea.classList.remove("drag-over");
+    fileInput.files = e.dataTransfer.files;
+    updateFileList();
+  });
+  fileInput.addEventListener("change", updateFileList);
+
+  function updateFileList() {
+    const list  = document.getElementById("fileList");
+    const files = Array.from(fileInput.files);
+    list.innerHTML = files.map(f => `<div class="file-item">✓ ${f.name}</div>`).join("");
+  }
+
+  async function runAudit() {
+    const budget = document.getElementById("budgetSlider").value;
+    const btn    = document.getElementById("runBtn");
+    btn.disabled = true;
+
+    document.getElementById("demoForm").style.display   = "none";
+    document.getElementById("demoStatus").style.display = "block";
+    setStatus("pending", "Waking up server…");
+    addLog("> Connecting to angshuman12-anvil.hf.space");
+
+    try { await fetch(`${API}/health`); } catch (_) {}
+
+    setStatus("running", "Submitting audit job…");
+
+    const fd = new FormData();
+    fd.append("model",  "resnet18");
+    fd.append("budget", budget);
+    for (const file of fileInput.files) fd.append("files", file);
+
+    let jobId;
+    try {
+      const res  = await fetch(`${API}/audit/upload`, { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Submission failed");
+      jobId = data.job_id;
+    } catch (e) {
+      setStatus("error", "Failed to submit: " + e.message);
+      btn.disabled = false;
+      return;
+    }
+
+    addLog(`> Job ${jobId.slice(0,8)}… queued`);
+    addLog(`> Running all 7 phases — this takes 3–5 minutes`);
+    addLog(`> Don't close this tab`);
+    pollJob(jobId, btn);
+  }
+
+  function pollJob(jobId, btn) {
+    pollTimer = setInterval(async () => {
+      try {
+        const res  = await fetch(`${API}/audit/job/${jobId}`);
+        const data = await res.json();
+
+        if (data.status === "complete") {
+          clearInterval(pollTimer);
+          setStatus("complete", "Audit complete!");
+          addLog(`> Vulnerability score : ${data.vulnerability_score}`, true);
+          addLog(`> Clusters found      : ${data.clusters_found}`, true);
+          addLog(`> Clusters patched    : ${data.clusters_patched}`, true);
+          addLog(`> Report ready`, true);
+          document.getElementById("downloadArea").style.display = "flex";
+          document.getElementById("downloadLink").href = `${API}/report/${data.report_filename}`;
+          btn.disabled = false;
+        } else if (data.status === "error") {
+          clearInterval(pollTimer);
+          setStatus("error", "Error: " + (data.error || "Unknown error"));
+          btn.disabled = false;
+        } else {
+          setStatus("running", data.status === "pending" ? "Queued — waiting for worker…" : "Running pipeline…");
+        }
+      } catch (_) { /* network hiccup — keep polling */ }
+    }, 6000);
+  }
+
+  function setStatus(type, text) {
+    const dot = document.getElementById("statusDot");
+    dot.className = "status-indicator " + type;
+    document.getElementById("statusText").textContent = text;
+  }
+
+  function addLog(text, success = false) {
+    const log = document.getElementById("phaseLog");
+    const div = document.createElement("div");
+    div.className = "log-line" + (success ? " success" : "");
+    div.textContent = text;
+    log.appendChild(div);
+  }
+
+  function resetDemo() {
+    clearInterval(pollTimer);
+    document.getElementById("demoForm").style.display   = "block";
+    document.getElementById("demoStatus").style.display = "none";
+    document.getElementById("phaseLog").innerHTML       = "";
+    document.getElementById("downloadArea").style.display = "none";
+    document.getElementById("fileList").innerHTML       = "";
+    document.getElementById("runBtn").disabled          = false;
+  }
+</script>
 </body>
 </html>
