@@ -12,14 +12,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Pre-download model weights so the first audit request doesn't time out
-RUN python -c "\
-from torchvision.models import resnet18, ResNet18_Weights; \
-resnet18(weights=ResNet18_Weights.IMAGENET1K_V1); \
-from transformers import DistilBertForSequenceClassification; \
-DistilBertForSequenceClassification.from_pretrained(\
-'distilbert-base-uncased-finetuned-sst-2-english')"
-
 EXPOSE 8000
 
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
