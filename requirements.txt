@@ -19,6 +19,7 @@ langchain>=0.2.0
 langchain-google-genai>=1.0.0
 llama-index>=0.10.0
 llama-index-embeddings-ollama>=0.1.0
+faiss-cpu>=1.7.4
 
 # Phase 7 — Report Generation
 reportlab>=4.0.0
