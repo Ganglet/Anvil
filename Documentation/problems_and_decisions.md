@@ -128,6 +128,24 @@ This document is a running log of every non-trivial problem encountered and ever
 
 ---
 
+## D14 — Radar charts over all other chart types for the PDF report
+
+**Phase:** 7 — Report Generation
+**Decision:** All four charts in the PDF report use polar radar/spider charts. Earlier iterations used a double-ring donut (attack distribution) and horizontal lollipop charts (layer norms, cluster sizes, safety scores).
+**Why lollipops were dropped:** Lollipop charts draw a text label adjacent to each dot. The offset `x + delta` produced overlap when values were close together or when the x-axis scale varied. The cluster size chart used `sz + 0.4` as offset, which overlapped when sizes were small. The patch dot chart used `score + 0.025` as the vertical offset — when `score = 0.0` the text landed directly on top of the dot. No static offset fixes both cases cleanly.
+**Why radar:** Label positions in a polar chart are fixed to the outer ring at predefined angles — they cannot overlap with interior data points regardless of value. A multi-series radar (patch quality chart) encodes 4 dimensions per cluster on a single chart, which no lollipop or bar alternative can do as legibly.
+**Fallback:** When a section has fewer than 3 axes (e.g. a single-cluster audit), a horizontal bar chart is used automatically. Three points is the minimum for a polygon to be visible on a polar chart.
+
+---
+
+## D15 — ReportLab `_table()` helper over post-hoc style extension
+
+**Phase:** 7 — Report Generation
+**Decision:** All styled tables are built via a `_table(rows, widths, extra=None)` helper that assembles all `TableStyle` commands before constructing the `Table`, rather than constructing the `Table` first and appending commands afterward.
+**Why:** `reportlab.platypus.Table` does not expose its style command list as a public attribute. An early implementation called `t._cmds.extend(extra_cmds)` to add per-row colour overrides after construction — this raised `AttributeError: 'Table' object has no attribute '_cmds'` at runtime. The internal attribute name differs across ReportLab versions. The fix collects base commands + `extra` into one list and passes it to `TableStyle()` in a single call. This is the documented API.
+
+---
+
 ## D10 — Small hardcoded synonym map for TextAttack, not WordNet
 
 **Phase:** 3 — Attack Engine
