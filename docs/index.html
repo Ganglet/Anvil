@@ -395,8 +395,8 @@
       <div class="phase-card">
         <div class="phase-num">Phase 8</div>
         <h3>API + Deployment</h3>
-        <p>FastAPI server with <code>POST /audit</code> and <code>GET /report/{"{filename}"}</code> endpoints. Packaged in Docker, deployed on Oracle Cloud Always Free VM.</p>
-        <span class="phase-tag">FastAPI · Docker · Oracle Cloud</span>
+        <p>FastAPI server with <code>POST /audit</code> and <code>GET /report/{"{filename}"}</code> endpoints. Packaged in Docker, deployed on HuggingFace Spaces.</p>
+        <span class="phase-tag">FastAPI · Docker · HuggingFace Spaces</span>
       </div>
 
     </div>
@@ -489,7 +489,7 @@
       </div>
       <div class="stack-card">
         <div class="label">Deployment</div>
-        <div class="value">Docker · Oracle Cloud Always Free</div>
+        <div class="value">Docker · HuggingFace Spaces</div>
       </div>
     </div>
   </div>
@@ -524,8 +524,8 @@
         <div><span class="prompt">$ </span><span class="cmd">echo "GOOGLE_API_KEY=your_key_here" > .env</span></div>
         <div><span class="prompt">$ </span><span class="cmd">docker-compose up --build</span></div>
         <div>&nbsp;</div>
-        <div><span class="cmt"># Trigger an audit via the REST API</span></div>
-        <div><span class="prompt">$ </span><span class="cmd">curl -X POST http://localhost:8000/audit \</span></div>
+        <div><span class="cmt"># Trigger an audit via the live REST API</span></div>
+        <div><span class="prompt">$ </span><span class="cmd">curl -X POST https://angshuman12-anvil.hf.space/audit \</span></div>
         <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">-H "Content-Type: application/json" \</span></div>
         <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">-d '{"model": "resnet18", "budget": 20}'</span></div>
       </div>
