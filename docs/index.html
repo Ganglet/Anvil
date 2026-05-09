@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ANVIL — Adversarial Neural Vulnerability Inspection and Learning</title>
+  <meta name="description" content="An autonomous ML red-teaming agent that attacks neural networks, explains their vulnerabilities, patches them, and generates a professional audit report — with zero human involvement." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:    #0f1e2e;
+      --navy2:   #1e3a5f;
+      --accent:  #2563eb;
+      --accent-l:#dbeafe;
+      --success: #059669;
+      --slate:   #64748b;
+      --body:    #1e293b;
+      --border:  #e2e8f0;
+      --light:   #f8fafc;
+      --white:   #ffffff;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--body);
+      background: var(--white);
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--navy);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 56px;
+      border-bottom: 2px solid var(--accent);
+    }
+    .nav-brand {
+      font-size: 1.1rem; font-weight: 800;
+      color: var(--white); letter-spacing: 0.08em;
+    }
+    .nav-links { display: flex; gap: 1.5rem; }
+    .nav-links a {
+      color: #94a3b8; text-decoration: none;
+      font-size: 0.875rem; font-weight: 500;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: var(--white); }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(160deg, var(--navy) 0%, var(--navy2) 100%);
+      color: var(--white);
+      padding: 5rem 2rem 4rem;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(37,99,235,0.25);
+      border: 1px solid rgba(37,99,235,0.5);
+      color: #93c5fd;
+      font-size: 0.75rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.3rem 0.9rem; border-radius: 999px;
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 800; letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .hero h1 span { color: #60a5fa; }
+    .hero-sub {
+      margin-top: 1.25rem;
+      font-size: 1.125rem; color: #94a3b8;
+      max-width: 600px; margin-left: auto; margin-right: auto;
+    }
+    .hero-buttons {
+      margin-top: 2.5rem;
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.7rem 1.5rem; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 600;
+      text-decoration: none; transition: all 0.15s;
+    }
+    .btn-primary {
+      background: var(--accent); color: var(--white);
+    }
+    .btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .btn-ghost {
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--white); background: transparent;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.08); }
+
+    /* ── Section ── */
+    section { padding: 5rem 2rem; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 3vw, 2rem);
+      font-weight: 800; color: var(--navy);
+      margin-bottom: 0.75rem;
+    }
+    .section-sub {
+      color: var(--slate); max-width: 580px; font-size: 0.975rem;
+    }
+    .divider {
+      height: 2px; background: var(--accent);
+      width: 48px; margin: 1rem 0 2.5rem;
+    }
+
+    /* ── Pipeline ── */
+    #pipeline { background: var(--light); }
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem; margin-top: 2.5rem;
+    }
+    .phase-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      transition: box-shadow 0.2s;
+    }
+    .phase-card:hover { box-shadow: 0 8px 24px rgba(15,30,46,0.1); }
+    .phase-num {
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 0.5rem;
+    }
+    .phase-card h3 {
+      font-size: 0.975rem; font-weight: 700;
+      color: var(--navy); margin-bottom: 0.5rem;
+    }
+    .phase-card p { font-size: 0.85rem; color: var(--slate); line-height: 1.55; }
+    .phase-tag {
+      display: inline-block; margin-top: 0.75rem;
+      background: var(--accent-l); color: var(--accent);
+      font-size: 0.7rem; font-weight: 600;
+      padding: 0.2rem 0.6rem; border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Demo ── */
+    .demo-box {
+      margin-top: 2.5rem;
+      background: var(--navy);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .demo-bar {
+      background: rgba(255,255,255,0.05);
+      padding: 0.6rem 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .demo-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+    .demo-content {
+      padding: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      line-height: 1.8;
+      min-height: 220px;
+    }
+    .demo-content .c-green  { color: #4ade80; }
+    .demo-content .c-blue   { color: #60a5fa; }
+    .demo-content .c-white  { color: #f1f5f9; }
+    .demo-content .c-yellow { color: #fbbf24; }
+    .demo-gif-placeholder {
+      display: flex; align-items: center; justify-content: center;
+      height: 220px; color: #475569; font-size: 0.85rem;
+      flex-direction: column; gap: 0.5rem;
+    }
+
+    /* ── Stack ── */
+    #stack { background: var(--white); }
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem; margin-top: 2.5rem;
+    }
+    .stack-card {
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+    }
+    .stack-card .label {
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--slate); margin-bottom: 0.35rem;
+    }
+    .stack-card .value {
+      font-size: 0.9rem; font-weight: 600;
+      color: var(--navy);
+    }
+
+    /* ── Quick start ── */
+    #quickstart { background: var(--light); }
+    .code-block {
+      margin-top: 2rem;
+      background: var(--navy);
+      border-radius: 10px; overflow: hidden;
+    }
+    .code-header {
+      background: rgba(255,255,255,0.05);
+      padding: 0.6rem 1.25rem;
+      font-size: 0.75rem; color: #64748b;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .code-body {
+      padding: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem; color: #94a3b8;
+      line-height: 2;
+      overflow-x: auto;
+    }
+    .code-body .prompt { color: #4ade80; user-select: none; }
+    .code-body .cmd    { color: #f1f5f9; }
+    .code-body .cmt    { color: #475569; }
+
+    /* ── Stats banner ── */
+    .stats-banner {
+      background: var(--navy2);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      text-align: center;
+    }
+    .stat-item {
+      padding: 2.5rem 1rem;
+      border-right: 1px solid rgba(255,255,255,0.07);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-size: 2.25rem; font-weight: 800;
+      color: var(--white);
+    }
+    .stat-lbl {
+      font-size: 0.8rem; color: #94a3b8;
+      margin-top: 0.25rem;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--navy);
+      color: #64748b;
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.82rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    footer a { color: #60a5fa; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .hero { padding: 3.5rem 1.25rem 3rem; }
+      section { padding: 3.5rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <span class="nav-brand">ANVIL</span>
+  <div class="nav-links">
+    <a href="#pipeline">Pipeline</a>
+    <a href="#demo">Demo</a>
+    <a href="#stack">Stack</a>
+    <a href="#quickstart">Quick Start</a>
+    <a href="https://github.com/Ganglet/Anvil" target="_blank">GitHub ↗</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-tag">Adversarial ML · AI Safety · LLM Agents</div>
+  <h1>Autonomous ML<br /><span>Red-Teaming Agent</span></h1>
+  <p class="hero-sub">
+    ANVIL attacks any neural network, clusters its failure modes, explains each
+    vulnerability using RAG-grounded LLM reasoning, patches it autonomously,
+    and generates a professional PDF audit report — with zero human involvement.
+  </p>
+  <div class="hero-buttons">
+    <a class="btn btn-primary" href="https://github.com/Ganglet/Anvil" target="_blank">
+      View on GitHub
+    </a>
+    <a class="btn btn-ghost" href="#quickstart">Quick Start →</a>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats-banner">
+  <div class="stat-item">
+    <div class="stat-num">7</div>
+    <div class="stat-lbl">Pipeline Phases</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">4</div>
+    <div class="stat-lbl">Attack Strategies</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">4</div>
+    <div class="stat-lbl">Patch Strategies</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">10</div>
+    <div class="stat-lbl">Research Papers in RAG</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">0</div>
+    <div class="stat-lbl">Human Decisions Required</div>
+  </div>
+</div>
+
+<!-- Pipeline -->
+<section id="pipeline">
+  <div class="container">
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">A closed-loop audit pipeline</h2>
+    <p class="section-sub">
+      Each phase transforms the output of the previous one. The model is the only input.
+      A complete audit report is the only output.
+    </p>
+    <div class="divider"></div>
+    <div class="pipeline-grid">
+
+      <div class="phase-card">
+        <div class="phase-num">Phase 1</div>
+        <h3>Model-Agnostic Interface</h3>
+        <p>Any PyTorch model plugs in through a unified ABC exposing <code>predict()</code>, <code>get_gradients()</code>, and <code>get_activations()</code>. Ships with ResNet-18 and DistilBERT wrappers.</p>
+        <span class="phase-tag">BaseModel ABC</span>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num">Phase 2</div>
+        <h3>Attack Surface Profiler</h3>
+        <p>Computes gradient norms, activation entropy, and Captum saliency per layer. Produces a vulnerability score and ranked attack priority list that guides Phase 3.</p>
+        <span class="phase-tag">Captum · IntegratedGradients</span>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num">Phase 3</div>
+        <h3>Multi-Strategy Attack Engine</h3>
+        <p>FGSM and PGD implemented from scratch using PyTorch autograd. Adversarial patch and semantic attacks (brightness, contrast, rotation). Text perturbation for NLP models.</p>
+        <span class="phase-tag">FGSM · PGD · Patch · Semantic</span>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num">Phase 4</div>
+        <h3>Failure Mode Clustering</h3>
+        <p>Extracts penultimate-layer activations from all successful attacks, reduces dimensionality with UMAP, clusters with HDBSCAN. No pre-specified cluster count — the taxonomy emerges from the data.</p>
+        <span class="phase-tag">UMAP · HDBSCAN</span>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num">Phase 5</div>
+        <h3>LLM Explanation Agent</h3>
+        <p>A LangGraph agent retrieves paper chunks from a FAISS index of 10 adversarial ML papers, then uses Gemini 2.5 Flash to write a grounded technical explanation and patch strategy per cluster.</p>
+        <span class="phase-tag">LangGraph · FAISS RAG · Gemini 2.5</span>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num">Phase 6</div>
+        <h3>Autonomous Patching</h3>
+        <p>Executes the recommended strategy (adversarial training, stylized augmentation, counterfactual generation, or targeted augmentation) with a 3-retry loop and composite safety gate (score ≥ 0.70).</p>
+        <span class="phase-tag">4 strategies · 3-retry loop</span>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num">Phase 7</div>
+        <h3>PDF Audit Report</h3>
+        <p>All phase outputs compiled into a professional multi-page PDF — cover page, executive summary, radar charts, per-cluster cards with LLM explanations, patch results, and methodology.</p>
+        <span class="phase-tag">ReportLab · matplotlib</span>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num">Phase 8</div>
+        <h3>API + Deployment</h3>
+        <p>FastAPI server with <code>POST /audit</code> and <code>GET /report/{"{filename}"}</code> endpoints. Packaged in Docker, deployed on Oracle Cloud Always Free VM.</p>
+        <span class="phase-tag">FastAPI · Docker · Oracle Cloud</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Demo -->
+<section id="demo">
+  <div class="container">
+    <div class="section-label">Demo</div>
+    <h2 class="section-title">Full pipeline in one command</h2>
+    <p class="section-sub">
+      Run the audit, watch each phase complete in the terminal, open the generated PDF.
+    </p>
+    <div class="divider"></div>
+    <div class="demo-box">
+      <div class="demo-bar">
+        <div class="demo-dot" style="background:#ef4444"></div>
+        <div class="demo-dot" style="background:#f59e0b"></div>
+        <div class="demo-dot" style="background:#22c55e"></div>
+        <span style="margin-left:0.5rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#475569">
+          terminal — audit.py
+        </span>
+      </div>
+      <div class="demo-content">
+        <div><span class="c-green">$</span> <span class="c-white">python audit.py --model resnet18 --input ./samples/ --budget 50</span></div>
+        <div>&nbsp;</div>
+        <div><span class="c-blue">[ANVIL]</span> <span class="c-white">Starting audit</span></div>
+        <div>&nbsp;&nbsp;Model  : <span class="c-yellow">resnet18</span> &nbsp;&nbsp; Budget : <span class="c-yellow">50 samples</span></div>
+        <div>&nbsp;</div>
+        <div><span class="c-blue">[1/7]</span> Model loaded: resnet18</div>
+        <div><span class="c-blue">[2/7]</span> Profile complete &nbsp; vulnerability score : <span class="c-yellow">0.421</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Attack priority : [<span class="c-white">layer4</span>, <span class="c-white">layer1</span>, <span class="c-white">avgpool</span>]</div>
+        <div><span class="c-blue">[3/7]</span> Attacks complete</div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FGSM &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-green">100.0%</span> success &nbsp; PGD <span class="c-green">100.0%</span> success</div>
+        <div><span class="c-blue">[4/7]</span> Clustering complete — <span class="c-yellow">2</span> vulnerability clusters</div>
+        <div><span class="c-blue">[5/7]</span> LLM agent — 2 clusters explained</div>
+        <div><span class="c-blue">[6/7]</span> Patching — 1/2 clusters patched</div>
+        <div><span class="c-blue">[7/7]</span> Report written to: <span class="c-green">audit_report.pdf</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stack -->
+<section id="stack">
+  <div class="container">
+    <div class="section-label">Technology Stack</div>
+    <h2 class="section-title">Built on proven tools</h2>
+    <p class="section-sub">
+      Every component chosen for a reason — documented in the build log.
+    </p>
+    <div class="divider"></div>
+    <div class="stack-grid">
+      <div class="stack-card">
+        <div class="label">Deep Learning</div>
+        <div class="value">PyTorch</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Adversarial Attacks</div>
+        <div class="value">PyTorch autograd (from scratch)</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Interpretability</div>
+        <div class="value">Captum</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Dimensionality Reduction</div>
+        <div class="value">UMAP</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Clustering</div>
+        <div class="value">HDBSCAN</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">LLM Agent</div>
+        <div class="value">LangGraph + Gemini 2.5 Flash</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">RAG</div>
+        <div class="value">LlamaIndex + FAISS</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Report Generation</div>
+        <div class="value">ReportLab + matplotlib</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">API</div>
+        <div class="value">FastAPI + Uvicorn</div>
+      </div>
+      <div class="stack-card">
+        <div class="label">Deployment</div>
+        <div class="value">Docker · Oracle Cloud Always Free</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Quick start -->
+<section id="quickstart">
+  <div class="container">
+    <div class="section-label">Quick Start</div>
+    <h2 class="section-title">Up and running in 3 steps</h2>
+    <div class="divider"></div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span>CLI</span>
+        <span>bash</span>
+      </div>
+      <div class="code-body">
+        <div><span class="prompt">$ </span><span class="cmd">git clone https://github.com/Ganglet/Anvil.git && cd Anvil_Project</span></div>
+        <div><span class="prompt">$ </span><span class="cmd">pip install -r requirements.txt</span></div>
+        <div><span class="prompt">$ </span><span class="cmd">export GOOGLE_API_KEY=your_key_here</span></div>
+        <div><span class="prompt">$ </span><span class="cmd">python audit.py --model resnet18 --input ./samples/ --output report.pdf --budget 20</span></div>
+      </div>
+    </div>
+
+    <div class="code-block" style="margin-top:1.25rem">
+      <div class="code-header">
+        <span>Docker</span>
+        <span>bash</span>
+      </div>
+      <div class="code-body">
+        <div><span class="prompt">$ </span><span class="cmd">echo "GOOGLE_API_KEY=your_key_here" > .env</span></div>
+        <div><span class="prompt">$ </span><span class="cmd">docker-compose up --build</span></div>
+        <div>&nbsp;</div>
+        <div><span class="cmt"># Trigger an audit via the REST API</span></div>
+        <div><span class="prompt">$ </span><span class="cmd">curl -X POST http://localhost:8000/audit \</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">-H "Content-Type: application/json" \</span></div>
+        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmd">-d '{"model": "resnet18", "budget": 20}'</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>
+    Built by <strong style="color:#f1f5f9">Angshuman Chakravertty</strong> ·
+    B.Tech CSE (Data Science), NMIMS Hyderabad ·
+    <a href="https://github.com/Ganglet/Anvil" target="_blank">GitHub</a>
+  </p>
+  <p style="margin-top:0.5rem">
+    ANVIL — Adversarial Neural Vulnerability Inspection and Learning
+  </p>
+</footer>
+
+</body>
+</html>
