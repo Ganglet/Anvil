@@ -661,12 +661,17 @@
 
     let jobId;
     try {
-      const res  = await fetch(`${API}/audit/upload`, { method: "POST", body: fd });
+      const res = await fetch(`${API}/audit/upload`, { method: "POST", body: fd });
+      const ct  = res.headers.get("content-type") || "";
+      if (!ct.includes("application/json")) {
+        throw new Error("Server is waking up — wait 30 seconds and click Try again.");
+      }
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Submission failed");
       jobId = data.job_id;
     } catch (e) {
-      setStatus("error", "Failed to submit: " + e.message);
+      setStatus("error", e.message);
+      document.getElementById("downloadArea").style.display = "flex";
       btn.disabled = false;
       return;
     }
@@ -690,12 +695,15 @@
           addLog(`> Clusters found      : ${data.clusters_found}`, true);
           addLog(`> Clusters patched    : ${data.clusters_patched}`, true);
           addLog(`> Report ready`, true);
+          const dl = document.getElementById("downloadLink");
+          dl.href = `${API}/report/${data.report_filename}`;
+          dl.style.display = "inline-flex";
           document.getElementById("downloadArea").style.display = "flex";
-          document.getElementById("downloadLink").href = `${API}/report/${data.report_filename}`;
           btn.disabled = false;
         } else if (data.status === "error") {
           clearInterval(pollTimer);
           setStatus("error", "Error: " + (data.error || "Unknown error"));
+          document.getElementById("downloadArea").style.display = "flex";
           btn.disabled = false;
         } else {
           setStatus("running", data.status === "pending" ? "Queued — waiting for worker…" : "Running pipeline…");
