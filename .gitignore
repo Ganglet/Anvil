@@ -32,6 +32,11 @@ outputs/
 *.jpg
 *.jpeg
 
+# Allow docs assets (React build output) and project images
+!docs/*.png
+!docs/assets/
+!image.png
+
 # Model weights and checkpoints — too large for git
 *.pt
 *.pth

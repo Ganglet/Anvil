@@ -1,13 +1,3 @@
----
-title: Anvil
-emoji: 🛡️
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-app_port: 8000
-pinned: false
----
-
 <p align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=0:050e1a,50:0f766e,100:14b8a6&height=200&section=header&text=ANVIL&fontSize=80&fontColor=ffffff&fontAlignY=38&animation=fadeIn&desc=Adversarial+Neural+Vulnerability+Inspection+and+Learning&descSize=14&descAlignY=58&descColor=5eead4" />
 </p>
@@ -36,54 +26,9 @@ pinned: false
 
 ANVIL takes any PyTorch neural network, runs it through a fully autonomous 8-phase adversarial auditing pipeline, and produces a professional PDF audit report — with zero human decisions.
 
-```
-  Target Model (ResNet-18 / DistilBERT / any PyTorch net)
-        │
-        ▼
-  ┌─────────────────────────────────────────────────┐
-  │  Phase 1 — Model Interface                      │
-  │  BaseModel ABC · predict · gradients · activations│
-  └──────────────────────┬──────────────────────────┘
-                         │
-        ┌────────────────▼────────────────┐
-        │  Phase 2 — Attack Surface Profiler│
-        │  Captum IG + Saliency            │
-        │  → vulnerability score + priority │
-        └────────────────┬────────────────┘
-                         │
-        ┌────────────────▼────────────────┐
-        │  Phase 3 — Attack Engine        │
-        │  FGSM · PGD · Patch · Semantic  │
-        │  → AdversarialExample objects   │
-        └────────────────┬────────────────┘
-                         │
-        ┌────────────────▼────────────────┐
-        │  Phase 4 — Failure Clustering   │
-        │  Activations → UMAP → HDBSCAN   │
-        │  → VulnerabilityTaxonomy        │
-        └────────────────┬────────────────┘
-                         │
-        ┌────────────────▼────────────────┐
-        │  Phase 5 — LLM Explanation Agent│
-        │  LangGraph + FAISS RAG          │
-        │  Gemini 2.5 Flash               │
-        └────────────────┬────────────────┘
-                         │
-        ┌────────────────▼────────────────┐
-        │  Phase 6 — Autonomous Patching  │
-        │  4 strategies · safety gate     │
-        └────────────────┬────────────────┘
-                         │
-        ┌────────────────▼────────────────┐
-        │  Phase 7 — PDF Audit Report     │
-        │  ReportLab · radar charts       │
-        └────────────────┬────────────────┘
-                         │
-        ┌────────────────▼────────────────┐
-        │  Phase 8 — REST API             │
-        │  FastAPI · Docker · HF Spaces   │
-        └─────────────────────────────────┘
-```
+<p align="center">
+  <img src="docs/architecture.png" alt="ANVIL Architecture Diagram" width="360" />
+</p>
 
 ---
 
@@ -146,7 +91,7 @@ For each cluster the agent injects cluster statistics (centroid, attack distribu
 
 **Safety gate formula:**
 
-$$\text{score} = 0.6 \times \text{resistance\_gain} + 0.4 \times \text{accuracy\_retention}$$
+$$score = 0.6 \times resistance\_gain + 0.4 \times accuracy\_retention$$
 
 A patch is accepted only if **score ≥ 0.70** AND **accuracy drop ≤ 3%**. On failure the engine escalates to the next strategy (up to 3 attempts per cluster).
 
