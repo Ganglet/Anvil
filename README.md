@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://ganglet.github.io/Anvil"><strong>Live Demo →</strong></a> &nbsp;|&nbsp;
-  <a href="https://angshuman12-anvil.hf.space"><strong>API →</strong></a>
+  <a href="https://angshuman12-anvil.hf.space/docs"><strong>API →</strong></a>
 </p>
 
 ---
