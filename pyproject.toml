@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "anvil-redteam"
+version = "0.1.0"
+description = "Autonomous adversarial neural network auditing: attack, cluster, explain, patch, report."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [{ name = "Angshuman Chakravertty", email = "bongunt@gmail.com" }]
+keywords = [
+    "adversarial-ml", "red-teaming", "neural-networks",
+    "llm-agent", "pytorch", "security", "auditing",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Security",
+]
+dependencies = [
+    "torch>=2.1.0",
+    "torchvision>=0.16.0",
+    "transformers>=4.40.0,<5.0.0",
+    "numpy>=1.24.0",
+    "Pillow>=10.0.0",
+    "captum>=0.7.0",
+    "umap-learn>=0.5.5",
+    "hdbscan>=0.8.33",
+    "scikit-learn>=1.3.0",
+    "langgraph>=0.1.0",
+    "langchain>=0.2.0",
+    "langchain-google-genai>=1.0.0",
+    "llama-index>=0.10.0",
+    "llama-index-embeddings-ollama>=0.1.0",
+    "faiss-cpu>=1.7.4",
+    "sentence-transformers>=2.7.0",
+    "reportlab>=4.0.0",
+    "matplotlib>=3.7.0",
+    "fastapi>=0.111.0",
+    "uvicorn[standard]>=0.29.0",
+    "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0.0", "ruff", "mypy"]
+
+[project.scripts]
+anvil = "audit:main"
+anvil-serve = "api:app"
+
+[project.urls]
+Homepage = "https://ganglet.github.io/Anvil"
+Repository = "https://github.com/Ganglet/Anvil"
+"API (HuggingFace)" = "https://angshuman12-anvil.hf.space"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = [
+    "models*", "profiler*", "attacks*", "clustering*",
+    "agent*", "patching*", "reporter*",
+]
+exclude = ["docs*", "frontend*", "tests*", "venv*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
