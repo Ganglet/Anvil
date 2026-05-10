@@ -28,7 +28,7 @@
 ANVIL takes any PyTorch neural network, runs it through a fully autonomous 8-phase adversarial auditing pipeline, and produces a professional PDF audit report — with zero human decisions.
 
 <p align="center">
-  <img src="docs/architecture.png" alt="ANVIL Architecture Diagram" width="360" />
+  <img src="docs/assets/architecture-BI-RRIAj.png" alt="ANVIL Architecture Diagram" width="360" />
 </p>
 
 ---
