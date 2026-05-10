@@ -12,7 +12,7 @@ from pathlib import Path
 import torch
 from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from PIL import Image
 from pydantic import BaseModel as PydanticModel, Field
 from torchvision import transforms
@@ -177,6 +177,11 @@ def _run_audit_job(job_id: str, file_contents: list, model_arg: str, budget: int
     except Exception as exc:
         log.exception("Job %s failed", job_id)
         _jobs[job_id].update({"status": "error", "error": str(exc)})
+
+
+@app.get("/")
+def root():
+    return RedirectResponse(url="https://ganglet.github.io/Anvil")
 
 
 @app.get("/health")
