@@ -35,6 +35,7 @@ outputs/
 # Allow docs assets (React build output) and project images
 !docs/*.png
 !docs/assets/
+!docs/assets/*.png
 !image.png
 
 # Model weights and checkpoints — too large for git
