@@ -1,7 +1,7 @@
 ---
 title: Anvil
 emoji: 🛡️
-colorFrom: teal
+colorFrom: green
 colorTo: indigo
 sdk: docker
 app_port: 8000
