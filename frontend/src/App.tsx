@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import Beams from './components/Beams';
 import FlowArt, { FlowSection } from './components/StoryScroll';
+import architectureImg from './assets/architecture.png';
 
 const API = 'https://angshuman12-anvil.hf.space';
 
@@ -189,7 +190,7 @@ function PipelineSection() {
           From raw model weights to signed PDF audit report — fully autonomous adversarial evaluation.
         </p>
         <img
-          src={`${import.meta.env.BASE_URL}architecture.png`}
+          src={architectureImg}
           alt="ANVIL Architecture"
           className="mx-auto mb-8 rounded-xl opacity-90"
           style={{ maxWidth: '320px', border: '1px solid var(--border)' }}
