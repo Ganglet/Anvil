@@ -11,6 +11,7 @@
   <img src="https://img.shields.io/badge/FastAPI-REST_API-009688?logo=fastapi&logoColor=white" />
   <img src="https://img.shields.io/badge/HuggingFace-Spaces-FFD21E?logo=huggingface&logoColor=black" />
   <img src="https://img.shields.io/badge/License-MIT-22c55e" />
+  <img src="https://img.shields.io/github/actions/workflow/status/Ganglet/Anvil/docker-publish.yml?label=Docker%20CI&logo=github" />
 </p>
 
 <h3 align="center">Autonomous ML Red-Teaming · Attack · Cluster · Explain · Patch · Report</h3>
@@ -138,16 +139,33 @@ Async job management via FastAPI `BackgroundTasks`. In-memory job store with pol
 
 ## Quick Start
 
+**Pip (recommended)**
+
+```bash
+pip install anvil-redteam
+anvil --model resnet18 --budget 50   # CLI
+anvil-serve                          # API server on :8000
+```
+
+**From source**
+
 ```bash
 git clone https://github.com/Ganglet/Anvil
 cd Anvil/Anvil_Project
-pip install -r requirements.txt
+pip install -e .
 
 # Run the API server
 uvicorn api:app --host 0.0.0.0 --port 8000
 
 # Or run the CLI pipeline directly
-python run.py --model resnet18 --budget 50
+python audit.py --model resnet18 --budget 50
+```
+
+**Docker**
+
+```bash
+docker pull ghcr.io/ganglet/anvil:latest
+docker run -p 8000:8000 ghcr.io/ganglet/anvil:latest
 ```
 
 Use the hosted demo at **[ganglet.github.io/Anvil](https://ganglet.github.io/Anvil)** — upload images, get a full PDF audit report back.
@@ -166,7 +184,7 @@ Anvil_Project/
 ├── patching/         # Phase 6 — Patcher, 4 strategies, safety gate
 ├── reporter/         # Phase 7 — ReportLab PDF generation
 ├── api.py            # Phase 8 — FastAPI server with async job management
-├── run.py            # CLI entry point
+├── audit.py          # CLI entry point
 ├── requirements.txt
 ├── Dockerfile
 └── frontend/         # React + Vite source for ganglet.github.io/Anvil
