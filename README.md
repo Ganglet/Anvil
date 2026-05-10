@@ -1,13 +1,3 @@
----
-title: Anvil
-emoji: 🛡️
-colorFrom: green
-colorTo: indigo
-sdk: docker
-app_port: 8000
-pinned: false
----
-
 <p align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=0:050e1a,50:0f766e,100:14b8a6&height=200&section=header&text=ANVIL&fontSize=80&fontColor=ffffff&fontAlignY=38&animation=fadeIn&desc=Adversarial+Neural+Vulnerability+Inspection+and+Learning&descSize=14&descAlignY=58&descColor=5eead4" />
 </p>
@@ -199,14 +189,14 @@ Anvil_Project/
 - **HuggingFace** — [huggingface.co](https://huggingface.co)
 - **Adversarial ML Benchmark (ATB)** — [github.com/MadryLab/ATB](https://github.com/MadryLab/ATB)
 
-<p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:8e44ad,50:2980b9,100:95a5a6&height=120&section=footer" />
-</p>
+---
 
 ## License
 
 Code: MIT — see [LICENSE](LICENSE)
 
+---
+
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:2980b9,50:922b21,100:c0392b&height=120&section=footer" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:8e44ad,50:2980b9,100:95a5a6&height=120&section=footer" />
 </p>
