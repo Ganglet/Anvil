@@ -72,63 +72,111 @@ function StatsBanner() {
   );
 }
 
+type Phase = {
+  num: string;
+  title: string;
+  subtitle: string;
+  body: string;
+  bullets: string[];
+  code?: string;
+  bg: string;
+  text: string;
+  accent: string;
+};
+
+function PhaseCard({ p }: { p: Phase }) {
+  return (
+    <FlowSection aria-label={`Phase ${p.num}: ${p.title}`} style={{ background: p.bg }}>
+      <p className="text-xs font-bold tracking-[0.2em] uppercase" style={{ color: p.accent }}>
+        {p.num} — {p.subtitle}
+      </p>
+      <hr style={{ border: 'none', borderTop: `1px solid ${p.accent}30`, margin: '1.5vw 0' }} />
+      <h2 className="font-black leading-[0.88] uppercase tracking-tight"
+        style={{ fontSize: 'clamp(3rem,9vw,8rem)', color: p.text }}>{p.title}</h2>
+      <hr style={{ border: 'none', borderTop: `1px solid ${p.accent}30`, margin: '1.5vw 0' }} />
+      <div className="flex flex-wrap gap-[4vw] flex-1">
+        <div className="min-w-[260px] flex-1">
+          <p className="text-base leading-relaxed mb-6" style={{ color: p.text, opacity: 0.8 }}>{p.body}</p>
+          <ul className="space-y-2">
+            {p.bullets.map((b, i) => (
+              <li key={i} className="flex items-start gap-2 text-sm" style={{ color: p.text, opacity: 0.7 }}>
+                <span style={{ color: p.accent, flexShrink: 0 }}>›</span>{b}
+              </li>
+            ))}
+          </ul>
+        </div>
+        {p.code && (
+          <div className="min-w-[260px] flex-1">
+            <pre className="rounded-xl p-5 text-xs leading-relaxed overflow-x-auto h-full"
+              style={{ background: 'rgba(0,0,0,0.4)', border: `1px solid ${p.accent}25`,
+                       fontFamily: "'JetBrains Mono', monospace", color: p.accent }}>
+              <code>{p.code}</code>
+            </pre>
+          </div>
+        )}
+      </div>
+      <hr style={{ border: 'none', borderTop: `1px solid ${p.accent}30`, margin: '1.5vw 0' }} />
+    </FlowSection>
+  );
+}
+
 function PipelineSection() {
-  const phases = [
+  const phases: Phase[] = [
     {
-      num: '01',
-      title: 'Model Interface',
-      subtitle: 'Unified Neural Network Wrapper',
-      body: 'BaseModel ABC wraps any PyTorch net with predict(), get_gradients(), get_activations(). Standardizes inputs and outputs across architectures for uniform pipeline processing.',
-      bg: 'var(--teal-dark)', text: '#fff',
+      num: '01', title: 'Model\nInterface', subtitle: 'Model-Agnostic Wrapper',
+      body: 'BaseModel ABC normalises any PyTorch neural network behind a single interface. ResNet-18 and DistilBERT ship as first-party wrappers.',
+      bullets: ['predict() — forward pass, returns logits', 'get_gradients() — loss w.r.t. input', 'get_activations() — penultimate-layer features', 'Any PyTorch net drops in with ~20 lines'],
+      code: `class ImageModel(BaseModel):\n  def predict(self, x):\n    return self.model(x)\n\n  def get_gradients(self, x, y):\n    x.requires_grad_(True)\n    loss = F.cross_entropy(\n      self.predict(x), y)\n    loss.backward()\n    return x.grad\n\n  def get_activations(self, x):\n    # penultimate layer hook\n    return self._hook_output`,
+      bg: 'var(--teal-dark)', text: '#fff', accent: '#5eead4',
     },
     {
-      num: '02',
-      title: 'Attack Surface Profiler',
-      subtitle: 'Captum Integrated Gradients + Saliency',
-      body: 'Runs Captum Integrated Gradients and Saliency analysis to generate a per-class vulnerability score and attack priority list. Identifies the most exposed decision boundaries before any adversarial attack is launched.',
-      bg: 'var(--surface2)', text: 'var(--teal-light)',
+      num: '02', title: 'Attack\nSurface', subtitle: 'Captum Gradient Analysis',
+      body: 'Captum Integrated Gradients and Saliency map the model\'s most exposed decision boundaries before a single adversarial example is crafted.',
+      bullets: ['Integrated Gradients — attribution baseline to input', 'Saliency — |∂L/∂x| per pixel/token', 'Vulnerability score = mean gradient norm × activation entropy', 'Outputs ordered attack priority list for Phase 3'],
+      code: `profiler = AttackSurfaceProfiler(model)\nprofile = profiler.profile(inputs, labels)\n\n# profile contains:\n# {\n#   'vulnerability_score': 0.73,\n#   'attack_priority': [\n#     'pgd', 'fgsm',\n#     'patch', 'semantic'\n#   ],\n#   'gradient_norms': tensor(...),\n#   'saliency_maps': tensor(...)\n# }`,
+      bg: 'var(--surface2)', text: 'var(--text)', accent: 'var(--teal)',
     },
     {
-      num: '03',
-      title: 'Attack Engine',
-      subtitle: 'Multi-Strategy Adversarial Attacks',
-      body: 'FGSM · PGD · Adversarial Patch · Semantic attacks — all built from scratch in PyTorch autograd. No external attack libraries. Budget-controlled perturbation with configurable epsilon and iteration count.',
-      bg: '#1a0800', text: 'var(--copper-light)',
+      num: '03', title: 'Attack\nEngine', subtitle: 'Multi-Strategy Adversarial Attacks',
+      body: 'Four attack strategies implemented from scratch in PyTorch autograd — no external libraries. Budget-controlled, profile-prioritised execution.',
+      bullets: ['FGSM — single-step gradient sign, ε=0.03', 'PGD — iterative projected gradient descent, 40 steps', 'Adversarial Patch — Brown et al. 2017, localised patch', 'Semantic — brightness, contrast, rotation, colour jitter'],
+      code: `engine = AttackEngine(model)\nresults = engine.run(\n  inputs, labels, profile)\n\n# Each AdversarialExample stores:\n# - original + perturbed tensor\n# - true_label, predicted_label\n# - attack_name, epsilon\n# - success: bool\n# - confidence scores\n\nrates = engine.success_rate(results)\n# {'pgd': 0.61, 'fgsm': 0.44, ...}`,
+      bg: '#1a0800', text: '#fff', accent: 'var(--copper-light)',
     },
     {
-      num: '04',
-      title: 'Failure Mode Clustering',
-      subtitle: 'UMAP + HDBSCAN Manifold Analysis',
-      body: 'Penultimate-layer activations from all adversarial failures are extracted, then projected via UMAP (non-linear manifold) and clustered with HDBSCAN (density-based). Falls back to PCA automatically if sample count < 20.',
-      bg: 'var(--surface)', text: 'var(--text)',
+      num: '04', title: 'Failure\nClustering', subtitle: 'UMAP + HDBSCAN Manifold Analysis',
+      body: 'Penultimate-layer activations from every successful attack are projected with UMAP, then clustered with HDBSCAN — no fixed cluster count required.',
+      bullets: ['Activations encode *why* the model failed, not just that it failed', 'UMAP: non-linear manifold, preserves local structure', 'HDBSCAN: density-based, identifies noise as cluster -1', 'n_neighbors = min(15, N-1), falls back to PCA if N < 20'],
+      code: `extractor = FeatureExtractor(model, profile)\nvectors, examples = extractor.extract(all_adv)\n\nclusterer = FailureModeClusterer(\n  n_components=5,\n  min_cluster_size=2\n)\ntaxonomy = clusterer.cluster(\n  vectors, examples,\n  model_name='resnet18'\n)\n# taxonomy.clusters → List[VulnerabilityCluster]`,
+      bg: 'var(--surface)', text: 'var(--text)', accent: 'var(--teal-light)',
     },
     {
-      num: '05',
-      title: 'LLM Explanation Agent',
-      subtitle: 'LangGraph + FAISS + Gemini 2.5 Flash',
-      body: 'A LangGraph stateful agent runs RAG over a FAISS index of 10 adversarial ML papers embedded with nomic-embed-text. Gemini 2.5 Flash generates grounded, citation-backed explanations for each failure cluster.',
-      bg: '#002b22', text: 'var(--teal-light)',
+      num: '05', title: 'LLM\nAgent', subtitle: 'LangGraph + FAISS RAG',
+      body: 'A stateful LangGraph agent retrieves from a FAISS index over 10 adversarial ML papers, then asks Gemini 2.5 Flash to explain each failure cluster with citations.',
+      bullets: ['10 papers indexed: Goodfellow 2015, Madry 2018, Carlini & Wagner 2017, Brown 2017 + 6 others', 'nomic-embed-text for dense retrieval', 'Cluster centroid + attack distribution injected into prompt', 'State graph can revisit explanation if coherence check fails'],
+      code: `# For each cluster in taxonomy:\n# 1. retrieve top-k chunks from FAISS\n# 2. build structured prompt:\n#    - cluster stats (size, attacks, centroid)\n#    - retrieved paper excerpts\n#    - "explain why this failure mode\n#       exists and how to patch it"\n# 3. Gemini 2.5 Flash generates:\n#    - root cause analysis\n#    - recommended patch strategy\n#    - citation list\nexplanation_report = run_agent(taxonomy)`,
+      bg: '#002b22', text: '#e2fdf7', accent: 'var(--teal)',
     },
     {
-      num: '06',
-      title: 'Autonomous Patching',
-      subtitle: '4 Strategies · Automated Safety Gate',
-      body: '4 autonomous patch strategies: adversarial training, stylized augmentation, counterfactual generation, targeted augmentation. Safety gate rejects any patch where accuracy drop exceeds 3% or robustness score falls below 0.70.',
-      bg: 'var(--copper)', text: '#fff',
+      num: '06', title: 'Autonomous\nPatching', subtitle: '4 Strategies · Safety Gate',
+      body: 'The patching engine selects the strategy recommended by Phase 5, applies it, and evaluates against a composite safety gate before accepting the result.',
+      bullets: ['Adversarial training — fine-tune on attack set with corrected labels', 'Stylized augmentation — domain-randomization via style transfer', 'Counterfactual generation — synthesize near-boundary examples', 'Targeted augmentation — cluster-specific oversampling'],
+      code: `# Safety gate formula:\n# score = 0.6 × resistance_gain\n#       + 0.4 × accuracy_retention\n#\n# Patch accepted only if:\n#   score ≥ 0.70\n#   AND accuracy_drop ≤ 0.03 (3%)\n#\n# On failure → escalates to next\n# strategy, up to 3 attempts.\n\npatch_report = Patcher().patch(\n  model, taxonomy,\n  explanation_report,\n  inputs, labels\n)`,
+      bg: 'var(--copper)', text: '#fff', accent: '#fde8d8',
     },
     {
-      num: '07',
-      title: 'Audit Report',
-      subtitle: 'Professional PDF via ReportLab',
-      body: 'ReportLab generates a multi-page PDF: executive cover page, radar charts for attack surface, per-cluster failure analysis cards with LLM explanations, full methodology appendix, and raw metric tables.',
-      bg: 'var(--surface2)', text: 'var(--text)',
+      num: '07', title: 'Audit\nReport', subtitle: 'ReportLab PDF Generation',
+      body: 'ReportLab assembles a multi-page structured PDF — indistinguishable in depth from a human-written red-team assessment.',
+      bullets: ['Cover page with model metadata and audit timestamp', 'Executive summary — vulnerability score + key findings', 'Radar chart (matplotlib) — per-attack-type success rates', 'Per-cluster cards — LLM explanation + patch outcome', 'Methodology appendix — algorithms and hyperparameters'],
+      code: `generate_report(\n  output_path='audit_resnet18.pdf',\n  model_name=model.model_name,\n  profile=profile,\n  attack_rates=rates,\n  total_fooled=84,\n  total_examples=200,\n  taxonomy=taxonomy,\n  explanation_report=explanation_report,\n  patch_report=patch_report\n)\n# → multi-page PDF, download via\n# GET /report/{filename}`,
+      bg: 'var(--surface2)', text: 'var(--text)', accent: 'var(--teal)',
     },
     {
-      num: '08',
-      title: 'REST API',
-      subtitle: 'FastAPI + Docker on HuggingFace Spaces',
-      body: 'FastAPI with async job management. POST /audit/upload → job_id. GET /audit/job/{id} polls status. GET /report/{filename} downloads PDF. Deployed via Docker on HuggingFace Spaces — fully serverless.',
-      bg: 'var(--surface)', text: 'var(--text)',
+      num: '08', title: 'REST\nAPI', subtitle: 'FastAPI + Docker on HuggingFace',
+      body: 'FastAPI wraps the entire pipeline with async job management. Submit images, get a job ID, poll for status, download the PDF — all over HTTP.',
+      bullets: ['POST /audit/upload — multipart images + model + budget → job_id', 'GET /audit/job/{id} — polls {status, vulnerability_score, clusters_found}', 'GET /report/{filename} — streams the PDF', 'CORS configured for ganglet.github.io'],
+      code: `# Submit audit\ncurl -X POST \\\n  https://angshuman12-anvil.hf.space\\\n  /audit/upload \\\n  -F "files=@cat.jpg" \\\n  -F "model=resnet18" \\\n  -F "budget=25"\n# → {"job_id": "abc-123"}\n\n# Poll status\ncurl https://angshuman12-anvil\\\n  .hf.space/audit/job/abc-123\n# → {"status":"complete",\n#    "clusters_found":3,\n#    "report_filename":"audit_...pdf"}`,
+      bg: 'var(--bg)', text: 'var(--text)', accent: 'var(--teal-light)',
     },
   ];
 
@@ -141,31 +189,14 @@ function PipelineSection() {
           From raw model weights to signed PDF audit report — fully autonomous adversarial evaluation.
         </p>
         <img
-          src="/Anvil/architecture.png"
+          src={`${import.meta.env.BASE_URL}architecture.png`}
           alt="ANVIL Architecture"
-          className="mx-auto max-w-xs opacity-80 mb-8"
+          className="mx-auto mb-8 rounded-xl opacity-90"
+          style={{ maxWidth: '320px', border: '1px solid var(--border)' }}
         />
       </div>
       <FlowArt>
-        {phases.map((p, i) => (
-          <FlowSection
-            key={i}
-            aria-label={`Phase ${p.num}: ${p.title}`}
-            style={{ background: p.bg }}
-          >
-            <div className="flex flex-col justify-center h-full min-h-screen py-20 px-8 md:px-20 max-w-4xl mx-auto w-full">
-              <div className="flex items-start gap-6 mb-6">
-                <span className="text-6xl font-black opacity-20 leading-none select-none"
-                  style={{ fontFamily: "'JetBrains Mono', monospace", color: p.text }}>{p.num}</span>
-                <div>
-                  <h3 className="text-3xl md:text-4xl font-black mb-2" style={{ color: p.text }}>{p.title}</h3>
-                  <p className="text-sm tracking-widest uppercase" style={{ color: p.text, opacity: 0.6 }}>{p.subtitle}</p>
-                </div>
-              </div>
-              <p className="text-lg leading-relaxed max-w-2xl" style={{ color: p.text, opacity: 0.85 }}>{p.body}</p>
-            </div>
-          </FlowSection>
-        ))}
+        {phases.map((p, i) => <PhaseCard key={i} p={p} />)}
       </FlowArt>
     </section>
   );
@@ -477,13 +508,13 @@ export default function App() {
         <div className="absolute inset-0 z-0">
           <Beams
             lightColor="#14b8a6"
-            beamNumber={14}
-            beamWidth={1.8}
-            beamHeight={18}
-            speed={1.8}
-            noiseIntensity={1.5}
-            scale={0.18}
-            rotation={-10}
+            beamNumber={20}
+            beamWidth={3}
+            beamHeight={30}
+            speed={2}
+            noiseIntensity={1.75}
+            scale={0.2}
+            rotation={30}
           />
         </div>
         <div className="relative z-10 max-w-4xl mx-auto">
