@@ -1,3 +1,13 @@
+---
+title: Anvil
+emoji: 🛡️
+colorFrom: teal
+colorTo: indigo
+sdk: docker
+app_port: 8000
+pinned: false
+---
+
 <p align="center">
   <img src="https://capsule-render.vercel.app/api?type=waving&color=0:050e1a,50:0f766e,100:14b8a6&height=200&section=header&text=ANVIL&fontSize=80&fontColor=ffffff&fontAlignY=38&animation=fadeIn&desc=Adversarial+Neural+Vulnerability+Inspection+and+Learning&descSize=14&descAlignY=58&descColor=5eead4" />
 </p>
@@ -174,15 +184,29 @@ Anvil_Project/
 
 ---
 
-## Limitations
+## Acknowledgments
 
-| Limitation | Reason |
-|------------|--------|
-| Attacks target image + text only | BaseModel is extensible; audio/tabular require new wrappers |
-| HuggingFace free tier sleeps after inactivity | First request after sleep takes 30–60s to wake the container |
-| HDBSCAN needs ≥ 2 clusters to produce a taxonomy | Very small budgets (< 15) may yield 0 clusters and a thin report |
-| Patching does not persist model weights | Patches are applied ephemerally for evaluation; no model is saved |
+- **PyTorch** — [pytorch.org](https://pytorch.org)
+- **Captum** — [pytorch.org/captum](https://pytorch.org/captum)
+- **UMAP-learn** — [github.com/lmcinnes/umap](https://github.com/lmcinnes/umap)
+- **HDBSCAN** — [github.com/scikit-learn-contrib/hdbscan](https://github.com/scikit-learn-contrib/hdbscan)
+- **LangGraph** — [langchain.com/langgraph](https://langchain.com/langgraph)
+- **LangChain** — [langchain.com](https://langchain.com)
+- **FAISS** — [github.com/facebookresearch/faiss](https://github.com/facebookresearch/faiss)
+- **ReportLab** — [reportlab.com](https://reportlab.com)
+- **Matplotlib** — [matplotlib.org](https://matplotlib.org)
+- **FastAPI** — [fastapi.tiangolo.com](https://fastapi.tiangolo.com)
+- **HuggingFace** — [huggingface.co](https://huggingface.co)
+- **Adversarial ML Benchmark (ATB)** — [github.com/MadryLab/ATB](https://github.com/MadryLab/ATB)
 
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:14b8a6,50:0f766e,100:050e1a&height=120&section=footer" />
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:8e44ad,50:2980b9,100:95a5a6&height=120&section=footer" />
+</p>
+
+## License
+
+Code: MIT — see [LICENSE](LICENSE)
+
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:2980b9,50:922b21,100:c0392b&height=120&section=footer" />
 </p>
