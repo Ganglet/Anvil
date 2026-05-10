@@ -65,13 +65,18 @@ class FailureModeClusterer:
     def _umap_reduce(self, vectors: np.ndarray, n: int) -> np.ndarray:
         n_neighbors = min(15, n - 1)
         n_components = min(self._n_components, n - 1)
-        reducer = umap.UMAP(
-            n_components=n_components,
-            n_neighbors=n_neighbors,
-            random_state=42,
-            low_memory=True,
-        )
-        return reducer.fit_transform(vectors)
+        try:
+            reducer = umap.UMAP(
+                n_components=n_components,
+                n_neighbors=n_neighbors,
+                random_state=42,
+                low_memory=True,
+            )
+            return reducer.fit_transform(vectors)
+        except Exception:
+            from sklearn.decomposition import PCA
+            pca = PCA(n_components=min(2, n - 1))
+            return pca.fit_transform(vectors)
 
     def _hdbscan_label(self, embedding: np.ndarray) -> np.ndarray:
         min_size = max(2, min(self._min_cluster_size, len(embedding) // 3))
